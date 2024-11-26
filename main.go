@@ -28,6 +28,10 @@ func main() {
 
 	r.LoadHTMLGlob("./static/pages/*")
 
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
 	r.GET("/question", func(c *gin.Context) {
 		question := c.Query("question")
 		choices := c.QueryArray("choices")

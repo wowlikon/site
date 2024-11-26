@@ -21,41 +21,97 @@
             href="/static/images/favicons/favicon-16x16.png"
         />
         <link rel="manifest" href="/static/images/favicons/site.webmanifest" />
+        <link rel="stylesheet" href="/static/styles/index.css" rel="preload"></link>
         <title>wowlikon</title>
     </head>
     <body>
         <h1>Hello, World!</h1>
 
         <h2>My Certificates</h2>
-        <div>
-            <img
-                src="https://api2.sololearn.com/v2/certificates/CT-6VSGLYGN/image/png?t=0"
-                alt="Python for Begginers"
-            />
-            <img
-                src="https://api2.sololearn.com/v2/certificates/CT-8UYMHYR5/image/png?t=0"
-                alt="Python Core"
-            />
-            <img
-                src="https://api2.sololearn.com/v2/certificates/CT-QJAB0APK/image/png?t=0"
-                alt="Intermediate Python"
-            />
-            <img
-                src="https://api2.sololearn.com/v2/certificates/CT-BMGA5GHG/image/png?t=0"
-                alt="Go"
-            />
-            <img
-                src="https://api2.sololearn.com/v2/certificates/CC-RYUVKHMW/image/png?t=638376942757207430"
-                alt="Introduction to C++"
-            />
-            <img
-                src="https://api2.sololearn.com/v2/certificates/CC-224IY7MV/image/png?t=638354846060894030"
-                alt="Introduction to Java"
-            />
-            <img
-                src="https://api2.sololearn.com/v2/certificates/CC-QETOCBUB/image/png?t=638360835514198190"
-                alt="Java Intermediate"
-            />
+        <div class="certificates">
+            <div class="sidebar">
+                <h2 onclick="showGallery('python', this)" class="active">Python</h2>
+                <h2 onclick="showGallery('go', this)">Go</h2>
+                <h2 onclick="showGallery('cpp', this)">C++</h2>
+                <h2 onclick="showGallery('java', this)">Java</h2>
+            </div>
+
+            <div class="gallery">
+                <div id="python" class="carousel active">
+                    <img src="https://api2.sololearn.com/v2/certificates/CT-6VSGLYGN/image/png?t=0" alt="Python for Beginners" />
+                    <img src="https://api2.sololearn.com/v2/certificates/CT-8UYMHYR5/image/png?t=0" alt="Python Core" />
+                    <img src="https://api2.sololearn.com/v2/certificates/CT-QJAB0APK/image/png?t=0" alt="Intermediate Python" />
+                </div>
+                <div id="go" class="carousel">
+                    <img src="https://api2.sololearn.com/v2/certificates/CT-BMGA5GHG/image/png?t=0" alt="Go" />
+                </div>
+                <div id="cpp" class="carousel">
+                    <img src="https://api2.sololearn.com/v2/certificates/CC-RYUVKHMW/image/png?t=638376942757207430" alt="Introduction to C++" />
+                </div>
+                <div id="java" class="carousel">
+                    <img src="https://api2.sololearn.com/v2/certificates/CC-224IY7MV/image/png?t=638354846060894030" alt="Introduction to Java" />
+                    <img src="https://api2.sololearn.com/v2/certificates/CC-QETOCBUB/image/png?t=638360835514198190" alt="Java Intermediate" />
+                </div>
+            </div>
         </div>
+
+        <h2>My repositories</h2>
+        <div class="repositories">
+            <div class="github-widget" data-username="wowlikon" data-repo="anitype_ds">
+                <h2 id="repo-name">
+                    <a id="repo-link" href="#" target="_blank"></a>
+                </h2>
+                <p id="repo-description"></p>
+                <p>Звёзды: <span id="repo -stars"></span></p>
+                <div class="language-bar"></div>
+                <div class="language-legend"></div>
+            </div>
+            <div class="github-widget" data-username="wowlikon" data-repo="qr_scanner">
+                <h2 id="repo-name">
+                    <a id="repo-link" href="#" target="_blank"></a>
+                </h2>
+                <p id="repo-description"></p>
+                <p>Звёзды: <span id="repo -stars"></span></p>
+                <div class="language-bar"></div>
+                <div class="language-legend"></div>
+            </div>
+            <div class="github-widget" data-username="wowlikon" data-repo="tik_tak_toe">
+                <h2 id="repo-name">
+                    <a id="repo-link" href="#" target="_blank"></a>
+                </h2>
+                <p id="repo-description"></p>
+                <p>Звёзды: <span id="repo -stars"></span></p>
+                <div class="language-bar"></div>
+                <div class="language-legend"></div>
+            </div>
+            <div class="github-widget" data-username="wowlikon" data-repo="go_tg_bot">
+                <h2 id="repo-name">
+                    <a id="repo-link" href="#" target="_blank"></a>
+                </h2>
+                <p id="repo-description"></p>
+                <p>Звёзды: <span id="repo -stars"></span></p>
+                <div class="language-bar"></div>
+                <div class="language-legend"></div>
+            </div>
+            <div class="github-widget" data-username="wowlikon" data-repo="go_lan_scanner">
+                <h2 id="repo-name">
+                    <a id="repo-link" href="#" target="_blank"></a>
+                </h2>
+                <p id="repo-description"></p>
+                <p>Звёзды: <span id="repo -stars"></span></p>
+                <div class="language-bar"></div>
+                <div class="language-legend"></div>
+            </div>
+            <div class="github-widget" data-username="wowlikon" data-repo="ds_minesweeper">
+                <h2 id="repo-name">
+                    <a id="repo-link" href="#" target="_blank"></a>
+                </h2>
+                <p id="repo-description"></p>
+                <p>Звёзды: <span id="repo -stars"></span></p>
+                <div class="language-bar"></div>
+                <div class="language-legend"></div>
+            </div>
+        </div>
+        <script src="/static/scripts/index.js"></script>
     </body>
 </html>
