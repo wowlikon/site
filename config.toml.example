@@ -1,0 +1,16 @@
+[server]
+host = "localhost"
+http_port = 80
+https_port = 443
+enable_https = false
+
+#Not used
+[admin]
+login = "admin"
+password = "admin"
+
+#Not used
+[database]
+user = "dbuser"
+password = "dbpassword"
+name = "dbname"
