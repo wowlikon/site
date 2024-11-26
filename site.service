@@ -1,0 +1,12 @@
+[Unit]
+Description=My Web Site (golang backend)
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/path/to/your/site
+ExecStart=/path/to/your/site/site
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
