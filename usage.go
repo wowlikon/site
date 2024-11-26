@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,23 +29,33 @@ type memoryStats struct {
 }
 
 type systemStats struct {
-	CPUCores int         `json:"cpu_cores"`
-	CPUUsage []float64   `json:"cpu_usage"`
-	Memory   memoryStats `json:"memory"`
+	UpdateInterval int         `json:"update_interval"`
+	CPUCores       int         `json:"cpu_cores"`
+	CPUUsage       []float64   `json:"cpu_usage"`
+	Memory         memoryStats `json:"memory"`
 }
 
-func getSystemStats(c *gin.Context) {
-	cpuCores := runtime.NumCPU()
-	cpuUsage := getCPUUsage()
-	memory := getMemoryUsage()
+var (
+	cache      systemStats
+	cacheMutex sync.Mutex
+	lastUpdate time.Time
+)
 
-	stats := systemStats{
-		CPUCores: cpuCores,
-		CPUUsage: cpuUsage,
-		Memory:   memory,
+func getSystemStats(c *gin.Context) {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
+	if time.Since(lastUpdate) > time.Duration(cache.UpdateInterval)*time.Second {
+		cache = systemStats{
+			UpdateInterval: 5,
+			CPUCores:       runtime.NumCPU(),
+			CPUUsage:       getCPUUsage(),
+			Memory:         getMemoryUsage(),
+		}
+		lastUpdate = time.Now()
 	}
 
-	c.JSON(http.StatusOK, stats)
+	c.JSON(http.StatusOK, cache)
 }
 
 func getCPUTimes() ([]cpuTime, error) {
@@ -80,7 +91,7 @@ func getCPUUsage() []float64 {
 	if err != nil {
 		return nil
 	}
-	time.Sleep(time.Second) // Wait for a second to measure again
+	time.Sleep(time.Second)
 	cpuTimes2, err := getCPUTimes()
 	if err != nil {
 		return nil
@@ -96,7 +107,6 @@ func getCPUUsage() []float64 {
 		totalTime1 := totalBusy1 + totalIdle1
 		totalTime2 := totalBusy2 + totalIdle2
 
-		// Calculate CPU usage as a percentage
 		cpuUsage = append(cpuUsage, float64(totalBusy2-totalBusy1)/float64(totalTime2-totalTime1)*100)
 	}
 	return cpuUsage
@@ -111,7 +121,6 @@ func getMemoryUsage() memoryStats {
 
 	var totalMemory, freeMemory, availableMemory, buffers, cachedMemory uint64
 
-	// Парсинг данных из meminfo
 	for _, line := range strings.Split(string(memInfo), "\n") {
 		if strings.HasPrefix(line, "MemTotal:") {
 			fmt.Sscanf(line, "MemTotal: %d kB", &totalMemory)
@@ -126,7 +135,6 @@ func getMemoryUsage() memoryStats {
 		}
 	}
 
-	// Используемая память = Общая память - Свободная память - Буферы - Кэшированная память
 	usedMemory := totalMemory - freeMemory - buffers - cachedMemory
 	percentUsed := (float64(usedMemory) / float64(totalMemory)) * 100
 
