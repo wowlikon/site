@@ -1,18 +1,15 @@
 *
 !*.*
+!/static/
+!/static/**
 
 *.db
 *.exe
-*.toml
-*.jar
-*.txt
 *.log
-*.bin
+*.txt
 *.zip
+*.json
+*.toml
 
 *.crt
 *.key
-
-/*.json
-!/*.json
-/*/*.json
