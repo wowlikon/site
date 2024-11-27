@@ -38,25 +38,37 @@
 
             <div class="gallery">
                 <div id="python" class="carousel active">
+                    <span class="arrow left" onclick="changeImage('python', -1)">&#10094;</span>
                     <img src="https://api2.sololearn.com/v2/certificates/CT-6VSGLYGN/image/png?t=0" alt="Python for Beginners" />
                     <img src="https://api2.sololearn.com/v2/certificates/CT-8UYMHYR5/image/png?t=0" alt="Python Core" />
                     <img src="https://api2.sololearn.com/v2/certificates/CT-QJAB0APK/image/png?t=0" alt="Intermediate Python" />
+                    <span class="arrow right" onclick="changeImage('python', 1)">&#10095;</span>
+                    <div class="indicator"></div>
                 </div>
                 <div id="go" class="carousel">
+                    <span class="arrow left" onclick="changeImage('go', -1)">&#10094;</span>
                     <img src="https://api2.sololearn.com/v2/certificates/CT-BMGA5GHG/image/png?t=0" alt="Go" />
+                    <span class="arrow right" onclick="changeImage('go', 1)">&#10095;</span>
+                    <div class="indicator"></div>
                 </div>
                 <div id="cpp" class="carousel">
+                    <span class="arrow left" onclick="changeImage('cpp', -1)">&#10094;</span>
                     <img src="https://api2.sololearn.com/v2/certificates/CC-RYUVKHMW/image/png?t=638376942757207430" alt="Introduction to C++" />
+                    <span class="arrow right" onclick="changeImage('cpp', 1)">&#10095;</span>
+                    <div class="indicator"></div>
                 </div>
                 <div id="java" class="carousel">
+                    <span class="arrow left" onclick="changeImage('java', -1)">&#10094;</span>
                     <img src="https://api2.sololearn.com/v2/certificates/CC-224IY7MV/image/png?t=638354846060894030" alt="Introduction to Java" />
                     <img src="https://api2.sololearn.com/v2/certificates/CC-QETOCBUB/image/png?t=638360835514198190" alt="Java Intermediate" />
+                    <span class="arrow right" onclick="changeImage('java', 1)">&#10095;</span>
+                    <div class="indicator"></div>
                 </div>
             </div>
         </div>
 
         <h2>My repositories</h2>
-        <div class="repositories">
+        <!--<div class="repositories">
             <div class="github-widget" data-username="wowlikon" data-repo="anitype_ds">
                 <h2 id="repo-name">
                     <a id="repo-link" href="#" target="_blank"></a>
@@ -111,7 +123,7 @@
                 <div class="language-bar"></div>
                 <div class="language-legend"></div>
             </div>
-        </div>
+            </div>-->
         <script src="/static/scripts/index.js"></script>
     </body>
 </html>

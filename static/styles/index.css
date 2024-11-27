@@ -55,7 +55,7 @@ h2 {
 }
 
 .sidebar {
-    width: 200px;
+    width: 100px;
     padding: 20px;
     background-color: #f4f4f4;
     border-right: 1px solid #ccc;
@@ -77,13 +77,22 @@ h2 {
 
 .carousel {
     display: none;
-    flex-direction: column;
+    position: relative;
     align-items: center;
+    flex-direction: column;
 }
 
 .carousel img {
-    width: 150px;
     margin: 10px;
+    height: 150px;
+    border-radius: 5px;
+    transition: transform 0.5s;
+}
+
+.carousel img:hover {
+    transform: scale(1.2);
+    border-radius: 12px;
+    cursor: zoom-in;
 }
 
 .active {
@@ -92,4 +101,46 @@ h2 {
 
 .sidebar h2.active {
     color: #84c40a;
+}
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: #2c3e50;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    z-index: 9;
+}
+
+.arrow.left {
+    left: 10px;
+}
+
+.arrow.right {
+    right: 10px;
+}
+
+.indicator {
+    text-align: center;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.indicator span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #bbb;
+    border-radius: 50%;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.indicator span.active {
+    background-color: #84c40a;
 }

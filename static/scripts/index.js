@@ -155,13 +155,16 @@ function getLanguageColor(language) {
   }
 }
 
+let currentImageIndex = {};
+
 function showGallery(language, headerElement) {
   const carousels = document.querySelectorAll(".carousel");
   carousels.forEach((carousel) => {
     carousel.classList.remove("active");
   });
 
-  document.getElementById(language).classList.add("active");
+  const activeCarousel = document.getElementById(language);
+  activeCarousel.classList.add("active");
 
   const headers = document.querySelectorAll(".sidebar h2");
   headers.forEach((header) => {
@@ -169,4 +172,47 @@ function showGallery(language, headerElement) {
   });
 
   headerElement.classList.add("active");
+
+  currentImageIndex[language] = 0;
+  updateImages(language);
+  updateIndicators(language);
 }
+
+function changeImage(galleryId, direction) {
+  const images = document.querySelectorAll(`#${galleryId} img`);
+  const totalImages = images.length;
+
+  currentImageIndex[galleryId] =
+    (currentImageIndex[galleryId] + direction + totalImages) % totalImages;
+  updateImages(galleryId);
+  updateIndicators(galleryId);
+}
+
+function updateImages(galleryId) {
+  const images = document.querySelectorAll(`#${galleryId} img`);
+  images.forEach((img, index) => {
+    img.style.display =
+      index === currentImageIndex[galleryId] ? "block" : "none";
+  });
+}
+
+function updateIndicators(galleryId) {
+  const indicatorsContainer = document.querySelector(
+    `#${galleryId} .indicator`,
+  );
+  indicatorsContainer.innerHTML = "";
+  const totalImages = document.querySelectorAll(`#${galleryId} img`).length;
+
+  for (let i = 0; i < totalImages; i++) {
+    const dot = document.createElement("span");
+    dot.className = i === currentImageIndex[galleryId] ? "active" : "";
+    dot.onclick = () => {
+      currentImageIndex[galleryId] = i;
+      updateImages(galleryId);
+      updateIndicators(galleryId);
+    };
+    indicatorsContainer.appendChild(dot);
+  }
+}
+
+showGallery("python", document.body.getElementsByClassName("active")[0]);
