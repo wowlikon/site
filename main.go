@@ -2,20 +2,18 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
 )
 
 var config Config
-
-type Question struct {
-	Question string
-	Choices  []string
-}
 
 func main() {
 	gin.SetMode(gin.ReleaseMode)
@@ -26,10 +24,37 @@ func main() {
 		os.Exit(1)
 	}
 
+	blockedPaths, err := loadBlockedPaths("./data/blocked_paths.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	rateLimiter := NewRateLimiter(60, time.Minute)
+	r.Use(rateLimiter.Limit(blockedPaths))
+	r.SetFuncMap(template.FuncMap{
+		"lower": strings.ToLower,
+	})
 	r.LoadHTMLGlob("./static/pages/*")
 
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
+		repositories, err := loadRepositories("./data/repositories.json")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось загрузить репозитории"})
+			return
+		}
+
+		certificates, err := loadCertificates("./data/certificates.json")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось загрузить сертификаты"})
+			return
+		}
+
+		data := MainPageData{
+			Certificates: certificates,
+			Repos:        repositories,
+		}
+
+		c.HTML(http.StatusOK, "index.html", data)
 	})
 
 	r.GET("/question", func(c *gin.Context) {
@@ -48,6 +73,7 @@ func main() {
 		c.HTML(http.StatusOK, "question.html", q)
 	})
 
+	r.GET("/api/repos/:username/:repo", ghCache)
 	r.GET("/api/stats", func(c *gin.Context) {
 		getSystemStats(c)
 	})
@@ -75,7 +101,7 @@ func main() {
 			log.Fatalf("HTTPS server failed: %v", err)
 		}
 	} else {
-		// Запускаем HTTP сервер
+		// Запускаем HTTP
 		if err := r.Run(fmt.Sprintf("%s:%d", config.Server.Host, config.Server.HttpPort)); err != nil {
 			log.Fatalf("HTTP server failed: %v", err)
 		}

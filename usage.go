@@ -36,7 +36,7 @@ type systemStats struct {
 }
 
 var (
-	cache      systemStats
+	statCache  systemStats
 	cacheMutex sync.Mutex
 	lastUpdate time.Time
 )
@@ -45,8 +45,8 @@ func getSystemStats(c *gin.Context) {
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
 
-	if time.Since(lastUpdate) > time.Duration(cache.UpdateInterval)*time.Second {
-		cache = systemStats{
+	if time.Since(lastUpdate) > time.Duration(statCache.UpdateInterval)*time.Second {
+		statCache = systemStats{
 			UpdateInterval: 5,
 			CPUCores:       runtime.NumCPU(),
 			CPUUsage:       getCPUUsage(),
@@ -55,7 +55,7 @@ func getSystemStats(c *gin.Context) {
 		lastUpdate = time.Now()
 	}
 
-	c.JSON(http.StatusOK, cache)
+	c.JSON(http.StatusOK, statCache)
 }
 
 func getCPUTimes() ([]cpuTime, error) {

@@ -30,100 +30,39 @@
         <h2>My Certificates</h2>
         <div class="certificates">
             <div class="sidebar">
-                <h2 onclick="showGallery('python', this)" class="active">Python</h2>
-                <h2 onclick="showGallery('go', this)">Go</h2>
-                <h2 onclick="showGallery('cpp', this)">C++</h2>
-                <h2 onclick="showGallery('java', this)">Java</h2>
+                <h2 onclick="showGallery('all', this)" class="all">All</h2>
+                {{ range $language, $certificates := .Certificates }}
+                    <h2 onclick="showGallery('{{ $language | lower }}', this)" class="{{ if eq $language "Python" }}active{{ end }}">{{ $language }}</h2>
+                {{ end }}
             </div>
-
             <div class="gallery">
-                <div id="python" class="carousel active">
-                    <span class="arrow left" onclick="changeImage('python', -1)">&#10094;</span>
-                    <img src="https://api2.sololearn.com/v2/certificates/CT-6VSGLYGN/image/png?t=0" alt="Python for Beginners" />
-                    <img src="https://api2.sololearn.com/v2/certificates/CT-8UYMHYR5/image/png?t=0" alt="Python Core" />
-                    <img src="https://api2.sololearn.com/v2/certificates/CT-QJAB0APK/image/png?t=0" alt="Intermediate Python" />
-                    <span class="arrow right" onclick="changeImage('python', 1)">&#10095;</span>
-                    <div class="indicator"></div>
-                </div>
-                <div id="go" class="carousel">
-                    <span class="arrow left" onclick="changeImage('go', -1)">&#10094;</span>
-                    <img src="https://api2.sololearn.com/v2/certificates/CT-BMGA5GHG/image/png?t=0" alt="Go" />
-                    <span class="arrow right" onclick="changeImage('go', 1)">&#10095;</span>
-                    <div class="indicator"></div>
-                </div>
-                <div id="cpp" class="carousel">
-                    <span class="arrow left" onclick="changeImage('cpp', -1)">&#10094;</span>
-                    <img src="https://api2.sololearn.com/v2/certificates/CC-RYUVKHMW/image/png?t=638376942757207430" alt="Introduction to C++" />
-                    <span class="arrow right" onclick="changeImage('cpp', 1)">&#10095;</span>
-                    <div class="indicator"></div>
-                </div>
-                <div id="java" class="carousel">
-                    <span class="arrow left" onclick="changeImage('java', -1)">&#10094;</span>
-                    <img src="https://api2.sololearn.com/v2/certificates/CC-224IY7MV/image/png?t=638354846060894030" alt="Introduction to Java" />
-                    <img src="https://api2.sololearn.com/v2/certificates/CC-QETOCBUB/image/png?t=638360835514198190" alt="Java Intermediate" />
-                    <span class="arrow right" onclick="changeImage('java', 1)">&#10095;</span>
-                    <div class="indicator"></div>
-                </div>
+                {{ range $language, $certificates := .Certificates }}
+                    <div id="{{ $language | lower }}" class="carousel {{ if eq $language "Python" }}active{{ end }}">
+                        <span class="arrow left" onclick="changeImage('{{ $language | lower }}', -1)">&#10094;</span>
+                        {{ range $certificates }}
+                            <img src="{{ . }}" alt="{{ $language }}" />
+                        {{ end }}
+                        <span class="arrow right" onclick="changeImage('{{ $language | lower }}', 1)">&#10095;</span>
+                        <div class="indicator"></div>
+                    </div>
+                {{ end }}
             </div>
         </div>
 
         <h2>My repositories</h2>
-        <!--<div class="repositories">
-            <div class="github-widget" data-username="wowlikon" data-repo="anitype_ds">
-                <h2 id="repo-name">
-                    <a id="repo-link" href="#" target="_blank"></a>
-                </h2>
-                <p id="repo-description"></p>
-                <p>Звёзды: <span id="repo -stars"></span></p>
-                <div class="language-bar"></div>
-                <div class="language-legend"></div>
-            </div>
-            <div class="github-widget" data-username="wowlikon" data-repo="qr_scanner">
-                <h2 id="repo-name">
-                    <a id="repo-link" href="#" target="_blank"></a>
-                </h2>
-                <p id="repo-description"></p>
-                <p>Звёзды: <span id="repo -stars"></span></p>
-                <div class="language-bar"></div>
-                <div class="language-legend"></div>
-            </div>
-            <div class="github-widget" data-username="wowlikon" data-repo="tik_tak_toe">
-                <h2 id="repo-name">
-                    <a id="repo-link" href="#" target="_blank"></a>
-                </h2>
-                <p id="repo-description"></p>
-                <p>Звёзды: <span id="repo -stars"></span></p>
-                <div class="language-bar"></div>
-                <div class="language-legend"></div>
-            </div>
-            <div class="github-widget" data-username="wowlikon" data-repo="go_tg_bot">
-                <h2 id="repo-name">
-                    <a id="repo-link" href="#" target="_blank"></a>
-                </h2>
-                <p id="repo-description"></p>
-                <p>Звёзды: <span id="repo -stars"></span></p>
-                <div class="language-bar"></div>
-                <div class="language-legend"></div>
-            </div>
-            <div class="github-widget" data-username="wowlikon" data-repo="go_lan_scanner">
-                <h2 id="repo-name">
-                    <a id="repo-link" href="#" target="_blank"></a>
-                </h2>
-                <p id="repo-description"></p>
-                <p>Звёзды: <span id="repo -stars"></span></p>
-                <div class="language-bar"></div>
-                <div class="language-legend"></div>
-            </div>
-            <div class="github-widget" data-username="wowlikon" data-repo="ds_minesweeper">
-                <h2 id="repo-name">
-                    <a id="repo-link" href="#" target="_blank"></a>
-                </h2>
-                <p id="repo-description"></p>
-                <p>Звёзды: <span id="repo -stars"></span></p>
-                <div class="language-bar"></div>
-                <div class="language-legend"></div>
-            </div>
-            </div>-->
         <script src="/static/scripts/index.js"></script>
+        <div class="repositories">
+            {{ range .Repos }}
+            <div class="github-widget" data-username="{{ .User  }}" data-repo="{{ .Repo }}">
+                <h2 id="repo-name">
+                    <a id="repo-link" href="#" target="_blank">{{ .Repo }}</a>
+                </h2>
+                <p id="repo-description"></p>
+                <p>Звёзды: <span id="repo-stars"></span></p>
+                <div class="language-bar"></div>
+                <div class="language-legend"></div>
+            </div>
+            {{ end }}
+        </div>
     </body>
 </html>

@@ -12,7 +12,7 @@ fetch(
       const username = widget.getAttribute("data-username");
       const repo = widget.getAttribute("data-repo");
 
-      fetch(`https://api.github.com/repos/${username}/${repo}`)
+      fetch(`/api/repos/${username}/${repo}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -23,16 +23,20 @@ fetch(
           const repoNameElement = widget.querySelector("h2");
           const repoLinkElement = document.createElement("a");
 
-          repoLinkElement.href = data.html_url;
+          // Доступ к данным о репозитории
+          repoLinkElement.href = data.repository.html_url;
           repoLinkElement.target = "_blank";
-          repoLinkElement.innerText = data.name || "Нет названия";
+          repoLinkElement.innerText = data.repository.name || "Нет названия";
 
           repoNameElement.innerHTML = "";
           repoNameElement.appendChild(repoLinkElement);
           widget.querySelector("p").innerText =
-            data.description || "Нет описания";
-          widget.querySelector("span").innerText = data.stargazers_count || 0;
-          loadLanguages(widget, username, repo);
+            data.repository.description || "Нет описания";
+          widget.querySelector("span").innerText =
+            data.repository.stargazers_count || 0;
+
+          createLanguageBar(widget, data.languages);
+          createLanguageLegend(widget, data.languages);
         })
         .catch((error) => {
           console.error("Error loading repo data:", error);
@@ -42,21 +46,6 @@ fetch(
     });
   })
   .catch((error) => console.error("Error loading colors:", error));
-
-function loadLanguages(widget, username, repo) {
-  fetch(`https://api.github.com/repos/${username}/${repo}/languages`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      createLanguageBar(widget, data);
-      createLanguageLegend(widget, data);
-    })
-    .catch((error) => console.error("Error loading languages:", error));
-}
 
 function createLanguageBar(widget, languages) {
   const languageBar = widget.querySelector(".language-bar");
@@ -79,9 +68,8 @@ function createLanguageBar(widget, languages) {
   for (const [language, percentage] of Object.entries(displayedLanguages)) {
     const segment = document.createElement("div");
     segment.style.width = `${percentage}%`;
-    segment.classList.add("language-segment");
-
     segment.style.backgroundColor = getLanguageColor(language);
+    segment.classList.add("language-segment");
     languageBar.appendChild(segment);
   }
 
@@ -144,15 +132,7 @@ function createLanguageLegend(widget, languages) {
 }
 
 function getLanguageColor(language) {
-  const languageData = languageColors[language];
-  if (languageData) {
-    return languageData.color;
-  } else {
-    console.warn(
-      `Цвет для языка "${language}" не найден. Используется черный.`,
-    );
-    return "#000000";
-  }
+  return languageColors[language].color || "#cccccc";
 }
 
 let currentImageIndex = {};
