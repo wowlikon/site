@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -86,6 +87,7 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		requestPath := c.Request.URL.Path
 		for _, regex := range blockedPaths {
 			if regex.MatchString(requestPath) {
+				log.Println("%s blocked by path %s\n", ip, requestPath)
 				c.AbortWithStatus(http.StatusForbidden)
 				rl.requests[ip] += rl.limit
 				return
@@ -96,6 +98,7 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		userAgent := c.Request.UserAgent()
 		for _, regex := range blockedUA {
 			if regex.MatchString(userAgent) {
+				log.Println("%s blocked by ua %s\n", ip, userAgent)
 				c.AbortWithStatus(http.StatusForbidden)
 				rl.requests[ip] += rl.limit
 				return
