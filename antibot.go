@@ -30,8 +30,8 @@ func NewRateLimiter(limit int, interval time.Duration) *RateLimiter {
 	}
 }
 
-func loadBlockedPaths(filename string) ([]*regexp.Regexp, error) {
-	var blockedPaths []*regexp.Regexp
+func loadBlock(filename string) ([]*regexp.Regexp, error) {
+	var blocked []*regexp.Regexp
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -40,13 +40,13 @@ func loadBlockedPaths(filename string) ([]*regexp.Regexp, error) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		path := strings.TrimSpace(scanner.Text())
-		if path != "" {
-			regex, err := regexp.Compile(path)
+		filter := strings.TrimSpace(scanner.Text())
+		if filter != "" {
+			regex, err := regexp.Compile(filter)
 			if err != nil {
 				return nil, err
 			}
-			blockedPaths = append(blockedPaths, regex)
+			blocked = append(blocked, regex)
 		}
 	}
 
@@ -54,10 +54,10 @@ func loadBlockedPaths(filename string) ([]*regexp.Regexp, error) {
 		return nil, err
 	}
 
-	return blockedPaths, nil
+	return blocked, nil
 }
 
-func (rl *RateLimiter) Limit(blockedPaths []*regexp.Regexp) gin.HandlerFunc {
+func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
 		rl.mu.Lock()
@@ -82,13 +82,20 @@ func (rl *RateLimiter) Limit(blockedPaths []*regexp.Regexp) gin.HandlerFunc {
 			return
 		}
 
+		// Проверка на заблокированные пути
 		requestPath := c.Request.URL.Path
-
 		for _, regex := range blockedPaths {
 			if regex.MatchString(requestPath) {
-				for key, value := range c.Request.Header {
-					fmt.Printf("%s: %s\n", key, value)
-				}
+				c.AbortWithStatus(http.StatusForbidden)
+				rl.requests[ip] += rl.limit
+				return
+			}
+		}
+
+		// Проверка на заблокированные User-Agent
+		userAgent := c.Request.UserAgent()
+		for _, regex := range blockedUA {
+			if regex.MatchString(userAgent) {
 				c.AbortWithStatus(http.StatusForbidden)
 				rl.requests[ip] += rl.limit
 				return

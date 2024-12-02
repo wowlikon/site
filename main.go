@@ -24,13 +24,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	blockedPaths, err := loadBlockedPaths("./data/blocked_paths.txt")
+	blockedPaths, err := loadBlock("./data/blocked_paths.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	blockedUA, err := loadBlock("./data/blocked_ua.txt")
 	if err != nil {
 		panic(err)
 	}
 
 	rateLimiter := NewRateLimiter(60, time.Minute)
-	r.Use(rateLimiter.Limit(blockedPaths))
+	r.Use(rateLimiter.Limit(blockedPaths, blockedUA))
 	r.SetFuncMap(template.FuncMap{
 		"lower": strings.ToLower,
 	})
