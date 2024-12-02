@@ -76,7 +76,7 @@ func (rl *RateLimiter) Limit(blockedPaths []*regexp.Regexp) gin.HandlerFunc {
 		rl.requests[ip]++
 		if rl.requests[ip] > rl.limit {
 			for key, value := range c.Request.Header {
-				fmt.Printf("%s: %s", key, value)
+				fmt.Printf("%s: %s\n", key, value)
 			}
 			c.AbortWithStatus(http.StatusTooManyRequests)
 			return
@@ -87,7 +87,7 @@ func (rl *RateLimiter) Limit(blockedPaths []*regexp.Regexp) gin.HandlerFunc {
 		for _, regex := range blockedPaths {
 			if regex.MatchString(requestPath) {
 				for key, value := range c.Request.Header {
-					fmt.Printf("%s: %s", key, value)
+					fmt.Printf("%s: %s\n", key, value)
 				}
 				c.AbortWithStatus(http.StatusForbidden)
 				rl.requests[ip] += rl.limit
