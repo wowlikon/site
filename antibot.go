@@ -39,6 +39,7 @@ func loadBlock(filename string) ([]*regexp.Regexp, error) {
 	}
 	defer file.Close()
 
+	//Загрузка списка regex
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		filter := strings.TrimSpace(scanner.Text())

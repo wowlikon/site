@@ -11,6 +11,6 @@ password = "admin"
 
 #Not used
 [database]
+name = "dbname"
 user = "dbuser"
 password = "dbpassword"
-name = "dbname"

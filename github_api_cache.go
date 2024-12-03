@@ -23,6 +23,7 @@ var cache = Cache{
 
 const cacheDuration = 30 * time.Minute
 
+// Получение данных из Github API
 func fetchFromGitHub(url string) (interface{}, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -42,6 +43,7 @@ func fetchFromGitHub(url string) (interface{}, error) {
 	return result, nil
 }
 
+// Проверка кэша и его обновление
 func getCachedData(username, repo, endpoint string) (interface{}, error) {
 	key := fmt.Sprintf("%s/%s/%s", username, repo, endpoint)
 
@@ -75,6 +77,7 @@ func getCachedData(username, repo, endpoint string) (interface{}, error) {
 	return data, nil
 }
 
+// Handler
 func ghCache(c *gin.Context) {
 	username := c.Param("username")
 	repo := c.Param("repo")

@@ -22,6 +22,7 @@ type MainPageData struct {
 	Repos        []Repository
 }
 
+// Загрузка списка репозиториев из файла
 func loadRepositories(filename string) ([]Repository, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -38,6 +39,7 @@ func loadRepositories(filename string) ([]Repository, error) {
 	return repositories, nil
 }
 
+// Загрузка списка сертификатов из файла
 func loadCertificates(filename string) (Certificates, error) {
 	file, err := os.Open(filename)
 	if err != nil {
