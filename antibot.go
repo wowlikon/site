@@ -89,7 +89,8 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 			for key, value := range c.Request.Header {
 				fmt.Printf("%s: %s\n", key, value)
 			}
-			c.AbortWithStatus(http.StatusTooManyRequests)
+			c.JSON(http.StatusTooManyRequests, gin.H{"message": "You have exceeded the number of allowed requests. Please wait before trying again."})
+			c.Abort()
 			return
 		}
 
@@ -98,7 +99,8 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		for _, regex := range blockedPaths {
 			if regex.MatchString(requestPath) {
 				log.Printf("%s blocked by path %s\n", ip, requestPath)
-				c.AbortWithStatus(http.StatusForbidden)
+				c.JSON(http.StatusForbidden, gin.H{"message": "Access forbidden: This path is restricted."})
+				c.Abort()
 				rl.requests[ip] += rl.limit
 				return
 			}
@@ -109,7 +111,8 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		for _, regex := range blockedUA {
 			if regex.MatchString(userAgent) {
 				log.Printf("%s blocked by ua %s\n", ip, userAgent)
-				c.AbortWithStatus(http.StatusForbidden)
+				c.JSON(http.StatusForbidden, gin.H{"message": "Access temporarily blocked due to User-Agent restrictions."})
+				c.Abort()
 				rl.requests[ip] += rl.limit
 				return
 			}
