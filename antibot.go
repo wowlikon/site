@@ -64,6 +64,7 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		rl.mu.Lock()
 		defer rl.mu.Unlock()
 
+		// Проверка на сброс блокировки по времени
 		now := time.Now()
 		if lastRequestTime, exists := rl.timestamps[ip]; exists {
 			if now.Sub(lastRequestTime) > rl.interval {
@@ -75,6 +76,14 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		}
 
 		rl.requests[ip]++
+
+		// Проверка на подозрительные типы ответа
+		acceptHeader := c.Request.Header.Get("Accept")
+		if acceptHeader == "*/*" {
+			rl.requests[ip]++
+		}
+
+		// Проверка на превышение лимита
 		if rl.requests[ip] > rl.limit {
 			for key, value := range c.Request.Header {
 				fmt.Printf("%s: %s\n", key, value)
@@ -87,7 +96,7 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		requestPath := c.Request.URL.Path
 		for _, regex := range blockedPaths {
 			if regex.MatchString(requestPath) {
-				log.Println("%s blocked by path %s\n", ip, requestPath)
+				log.Printf("%s blocked by path %s\n", ip, requestPath)
 				c.AbortWithStatus(http.StatusForbidden)
 				rl.requests[ip] += rl.limit
 				return
@@ -98,7 +107,7 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 		userAgent := c.Request.UserAgent()
 		for _, regex := range blockedUA {
 			if regex.MatchString(userAgent) {
-				log.Println("%s blocked by ua %s\n", ip, userAgent)
+				log.Printf("%s blocked by ua %s\n", ip, userAgent)
 				c.AbortWithStatus(http.StatusForbidden)
 				rl.requests[ip] += rl.limit
 				return
