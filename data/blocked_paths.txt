@@ -4,12 +4,14 @@
 .*\.env.*
 .*\.esp
 .*\.ini
+.*\.json
 .*\.jsp
 .*\.osx
 .*\.rsp
 .*cgi.*
 .*laravel.*
 .*php.*
+.*/Powershell.*
 .*vendor.*
 /.aws/credentials
 /.git/config
@@ -25,7 +27,11 @@
 /boaform
 /containers/json
 /dns-query
+/debug/default/view
+/dns-query
 /download/file\.ext
+/druid/index.html
+/evox/about
 /geoip/
 /geoserver/web/
 /info.*
@@ -37,8 +43,10 @@
 /owncloud.*
 /query
 /ReportServer
+/remote/fgt_lang
 /remote/logincheck
 /resolve
 /sdk
 /SiteLoader
+/teorema505
 /version
