@@ -24,13 +24,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	blockedPaths, err := loadBlockedPaths("./data/blocked_paths.txt")
+	blockedPaths, err := loadBlock("./data/blocked_paths.txt")
 	if err != nil {
 		panic(err)
 	}
 
+	blockedUA, err := loadBlock("./data/blocked_ua.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	// Установка блокировки ботов
 	rateLimiter := NewRateLimiter(60, time.Minute)
-	r.Use(rateLimiter.Limit(blockedPaths))
+	r.Use(rateLimiter.Limit(blockedPaths, blockedUA))
 	r.SetFuncMap(template.FuncMap{
 		"lower": strings.ToLower,
 	})
@@ -80,6 +86,8 @@ func main() {
 
 	r.Static("/static", "./static")
 	r.StaticFile("/favicon.ico", "./static/images/favicons/site.webmanifest")
+
+	// Запуск сервера
 	fmt.Printf("Starting server http://%s:%d\n", config.Server.Host, config.Server.HttpPort)
 	if config.Server.EnableHTTPS {
 		fmt.Printf("Starting server https://%s:%d\n", config.Server.Host, config.Server.HttpsPort)

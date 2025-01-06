@@ -41,6 +41,7 @@ var (
 	lastUpdate time.Time
 )
 
+// Получение статистики о нагрузке
 func getSystemStats(c *gin.Context) {
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()

@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -29,23 +31,24 @@ func NewRateLimiter(limit int, interval time.Duration) *RateLimiter {
 	}
 }
 
-func loadBlockedPaths(filename string) ([]*regexp.Regexp, error) {
-	var blockedPaths []*regexp.Regexp
+func loadBlock(filename string) ([]*regexp.Regexp, error) {
+	var blocked []*regexp.Regexp
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
+	//Загрузка списка regex
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		path := strings.TrimSpace(scanner.Text())
-		if path != "" {
-			regex, err := regexp.Compile(path)
+		filter := strings.TrimSpace(scanner.Text())
+		if filter != "" {
+			regex, err := regexp.Compile(filter)
 			if err != nil {
 				return nil, err
 			}
-			blockedPaths = append(blockedPaths, regex)
+			blocked = append(blocked, regex)
 		}
 	}
 
@@ -53,15 +56,16 @@ func loadBlockedPaths(filename string) ([]*regexp.Regexp, error) {
 		return nil, err
 	}
 
-	return blockedPaths, nil
+	return blocked, nil
 }
 
-func (rl *RateLimiter) Limit(blockedPaths []*regexp.Regexp) gin.HandlerFunc {
+func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
 		rl.mu.Lock()
 		defer rl.mu.Unlock()
 
+		// Проверка на сброс блокировки по времени
 		now := time.Now()
 		if lastRequestTime, exists := rl.timestamps[ip]; exists {
 			if now.Sub(lastRequestTime) > rl.interval {
@@ -73,16 +77,42 @@ func (rl *RateLimiter) Limit(blockedPaths []*regexp.Regexp) gin.HandlerFunc {
 		}
 
 		rl.requests[ip]++
+
+		// Проверка на подозрительные типы ответа
+		acceptHeader := c.Request.Header.Get("Accept")
+		if acceptHeader == "*/*" {
+			rl.requests[ip]++
+		}
+
+		// Проверка на превышение лимита
 		if rl.requests[ip] > rl.limit {
-			c.AbortWithStatus(http.StatusTooManyRequests)
+			for key, value := range c.Request.Header {
+				fmt.Printf("%s: %s\n", key, value)
+			}
+			c.JSON(http.StatusTooManyRequests, gin.H{"message": "You have exceeded the number of allowed requests. Please wait before trying again."})
+			c.Abort()
 			return
 		}
 
+		// Проверка на заблокированные пути
 		requestPath := c.Request.URL.Path
-
 		for _, regex := range blockedPaths {
 			if regex.MatchString(requestPath) {
-				c.AbortWithStatus(http.StatusForbidden)
+				log.Printf("%s blocked by path %s\n", ip, requestPath)
+				c.JSON(http.StatusForbidden, gin.H{"message": "Access forbidden: This path is restricted."})
+				c.Abort()
+				rl.requests[ip] += rl.limit
+				return
+			}
+		}
+
+		// Проверка на заблокированные User-Agent
+		userAgent := c.Request.UserAgent()
+		for _, regex := range blockedUA {
+			if regex.MatchString(userAgent) {
+				log.Printf("%s blocked by ua %s\n", ip, userAgent)
+				c.JSON(http.StatusForbidden, gin.H{"message": "Access temporarily blocked due to User-Agent restrictions."})
+				c.Abort()
 				rl.requests[ip] += rl.limit
 				return
 			}
