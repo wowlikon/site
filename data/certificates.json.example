@@ -1,0 +1,17 @@
+{
+  "Python": [
+    "https://link_to_your_certificate.com/certificate1.png",
+    "https://link_to_your_certificate.com/certificate2.png",
+    "https://link_to_your_certificate.com/certificate3.png"
+  ],
+  "Go": [
+    "https://link_to_your_certificate.com/certificate.png"
+  ],
+  "C++": [
+    "https://link_to_your_certificate.com/certificate.png"
+  ],
+  "Java": [
+    "https://link_to_your_certificate.com/certificate1.png",
+    "https://link_to_your_certificate.com/certificate2.png"
+  ]
+}
