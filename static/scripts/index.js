@@ -1,3 +1,47 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const avatar = document.getElementById("user-avatar");
+  const dropdownMenu = document.getElementById("dropdown-menu");
+
+  // Пример обработки логина
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(loginForm);
+    const response = await fetch("/login", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      avatar.src = `https://www.gravatar.com/avatar/${data.gravatarHash}?s=80&d=identicon`;
+      dropdownMenu.innerHTML = `<p>Welcome, ${data.username}!</p>`;
+    } else {
+      alert("Login failed");
+    }
+  });
+
+  // Пример обработки регистрации
+  registerForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(registerForm);
+    const response = await fetch("/register", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      alert("Registration successful! Please log in.");
+      registerForm.reset();
+    } else {
+      alert("Registration failed");
+    }
+  });
+});
+
 let languageColors = {};
 
 fetch(
