@@ -6,22 +6,49 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+type ProtocolType int
+
+const (
+	None      ProtocolType = iota // 0
+	HTTP                          // 1
+	HTTPS                         // 2
+	HTTPHTTPS                     // 3
+)
+
 type Config struct {
+	Admin    AdminConfig
+	Tokens   TokenConfig
 	Server   ServerConfig
 	Database DatabaseConfig
 }
 
 type ServerConfig struct {
-	Host        string
-	HttpPort    int  `toml:"http_port"`
-	HttpsPort   int  `toml:"https_port"`
-	EnableHTTPS bool `toml:"enable_https"`
+	Host      string `toml:"host"`
+	HttpPort  int    `toml:"http_port"`
+	HttpsPort int    `toml:"https_port"`
+	Protocols int    `toml:"protocols"`
+}
+
+type TokenConfig struct {
+	Discord  string `toml:"ds"`
+	Telegram string `toml:"tg"`
+}
+
+type CanvasConfig struct {
+	Side      int `toml:"side"`
+	Timeout   int `toml:"timeout"`
+	FreeSpace int `toml:"free_space"`
+}
+
+type AdminConfig struct {
+	Login    string `toml:"login"`
+	Password string `toml:"password"`
 }
 
 type DatabaseConfig struct {
-	User     string
-	Password string
-	Name     string
+	Name     string `toml:"name"`
+	User     string `toml:"user"`
+	Password string `toml:"password"`
 }
 
 func LoadConfig(filename string) (Config, error) {

@@ -2,7 +2,20 @@
 host = "localhost"
 http_port = 80
 https_port = 443
-enable_https = false
+protocols = 3
+# 0 None
+# 1 Http
+# 2 Https
+# 3 Http + Https
+
+[tokens]
+ds = "**************************.******.-*****-*******************************"
+tg = "0000000000:***********************************"
+
+[canvas]
+side = 256
+timeout = 60
+free_space = 128
 
 #Not used
 [admin]

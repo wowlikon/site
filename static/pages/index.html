@@ -29,6 +29,44 @@
         <title>wowlikon</title>
     </head>
     <body>
+        <header>
+            <div class="user-menu">
+                <img
+                    id="user-avatar"
+                    src="/static/images/default-avatar.png"
+                    alt="User Avatar"
+                    class="avatar"
+                />
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <!-- Login Form -->
+                    <form id="login-form">
+                        <h3>Log In</h3>
+                        <label for="login-username">Username:</label>
+                        <input type="text" id="login-username" name="username" required />
+
+                        <label for="login-password">Password:</label>
+                        <input type="password" id="login-password" name="password" required />
+
+                        <button type="submit">Log In</button>
+                    </form>
+
+                    <hr />
+
+                    <!-- Registration Form -->
+                    <form id="register-form">
+                        <h3>Register</h3>
+                        <label for="register-username">Username:</label>
+                        <input type="text" id="register-username" name="username" required />
+
+                        <label for="register-password">Password:</label>
+                        <input type="password" id="register-password" name="password" required />
+
+                        <button type="submit">Register</button>
+                    </form>
+                </div>
+            </div>
+        </header>
+
         <h1>Hello, World!</h1>
 
         <h2>My Certificates</h2>

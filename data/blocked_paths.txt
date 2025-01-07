@@ -3,10 +3,13 @@
 .*\.env.*
 .*\.esp
 .*\.ini
+.*\.json
 .*\.jsp
+.*\.rsp
 .*cgi.*
 .*laravel.*
 .*php.*
+.*/Powershell.*
 .*vendor.*
 /.aws/credentials
 /.git/config
@@ -16,7 +19,10 @@
 /actuator/health
 /api/v2/static/not\.found
 /bin/sh
+/debug/default/view
 /dns-query
+/druid/index.html
+/evox/about
 /geoip/
 /geoserver/web/
 /info.*
@@ -24,7 +30,10 @@
 /manager/html
 /owncloud.*
 /query
+/remote/fgt_lang
 /remote/logincheck
+/ReportServer
 /resolve
 /sdk
+/teorema505
 /version
