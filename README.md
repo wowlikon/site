@@ -84,13 +84,13 @@ sudo systemctl enable site.service --now
 ```
 
 ## API Endpoints
-| Метод | Endpoint | Описание |
-|-------|----------|-----------|
-| POST  | /account/register | Регистрация нового пользователя |
-| POST  | /account/login | Аутентификация пользователя |
-| GET   | /account/profile | Получение профиля пользователя (требует JWT) |
-| GET   | /api/repos/:username/:repo | Получение информации о GitHub репозитории |
-| GET   | /api/stats | Получение системной статистики |
+| Endpoint | Метод | Описание |
+|----------|-------|-----------|
+| /account/register | POST | Регистрация нового пользователя |
+| /account/login | POST | Аутентификация пользователя |
+| /account/profile | GET | Получение профиля пользователя (требует JWT) |
+| /api/repos/:username/:repo | GET | Получение информации о GitHub репозитории |
+| /api/stats | GET | Получение системной статистики |
 
 ## Структура проекта
 ```
@@ -139,6 +139,7 @@ site/
   - HTTP/HTTPS
   - bit-torrent
   - другие источники
+- telegram/discord бот
 
 ## Автор
 [wowlikon](https://github.com/wowlikon)
