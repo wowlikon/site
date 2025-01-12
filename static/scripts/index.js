@@ -1,3 +1,138 @@
+function isAuthenticated() {
+  return !!localStorage.getItem("authToken");
+}
+
+function setupMenu() {
+  const tabs = document.querySelector(".tabs");
+  const avatar = document.getElementById("avatar");
+  const authForms = document.querySelector(".tab-content");
+  const profileMenu = document.getElementById("profile-menu");
+  const userName = document.getElementById("user-name");
+
+  if (isAuthenticated()) {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    userName.textContent = userData.email || "User  ";
+    avatar.src = `https://www.gravatar.com/avatar/${md5(userData.email)}?d=identicon`;
+    tabs.classList.add("hidden");
+    authForms.classList.add("hidden");
+    profileMenu.classList.remove("hidden");
+  } else {
+    avatar.src = "/static/images/default-avatar.png";
+    authForms.classList.remove("hidden");
+    profileMenu.classList.add("hidden");
+    authForms.classList.add("active");
+    tabs.classList.remove("hidden");
+  }
+}
+
+document.querySelectorAll(".tab-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    document
+      .querySelectorAll(".tab-button")
+      .forEach((b) => b.classList.remove("active"));
+
+    document
+      .querySelectorAll(".tab-pane")
+      .forEach((pane) => pane.classList.remove("active"));
+
+    button.classList.add("active");
+
+    const targetTab = document.getElementById(button.dataset.tab);
+    targetTab.classList.add("active");
+  });
+});
+
+document
+  .getElementById("login-tab")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+
+    try {
+      const response = await fetch("/account/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error);
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("userData", JSON.stringify({ email }));
+
+      alert("Вход выполнен!");
+      setupMenu();
+    } catch (error) {
+      console.error("Ошибка при входе:", error);
+      alert("Произошла ошибка при входе.");
+    }
+  });
+
+document
+  .getElementById("register-tab")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = document.getElementById("register-email").value;
+    const password = document.getElementById("register-password").value;
+    const confirmPassword = document.getElementById(
+      "register-confirm-password",
+    ).value;
+
+    if (password !== confirmPassword) {
+      alert("Пароли не совпадают!");
+      return;
+    }
+
+    try {
+      const response = await fetch("/account/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error);
+        return;
+      }
+
+      alert("Регистрация выполнена!");
+    } catch (error) {
+      console.error("Ошибка при регистрации:", error);
+      alert("Произошла ошибка при регистрации.");
+    }
+  });
+
+document.getElementById("logout-button").addEventListener("click", () => {
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("userData");
+
+  alert("Вы вышли из аккаунта.");
+  setupMenu();
+});
+
+document.querySelector(".menu-button").addEventListener("click", () => {
+  const dropdown = document.querySelector(".dropdown");
+  dropdown.style.display =
+    dropdown.style.display === "block" ? "none" : "block";
+});
+
+function md5(string) {
+  return CryptoJS.MD5(string).toString();
+}
+
+document.addEventListener("DOMContentLoaded", setupMenu);
+
 let languageColors = {};
 
 fetch(

@@ -59,6 +59,47 @@ func loadBlock(filename string) ([]*regexp.Regexp, error) {
 	return blocked, nil
 }
 
+func (rl *RateLimiter) CleanupExpiredBlocks() {
+	ticker := time.NewTicker(30 * time.Minute)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		rl.mu.Lock()
+		now := time.Now()
+		for ip, lastRequestTime := range rl.timestamps {
+			if now.Sub(lastRequestTime) > rl.interval {
+				delete(rl.requests, ip)
+				delete(rl.timestamps, ip)
+			}
+		}
+		rl.mu.Unlock()
+	}
+}
+
+func AutoUpdateBlockedLists(pathsFile, uaFile string, paths, ua *[]*regexp.Regexp, mu *sync.RWMutex) {
+	ticker := time.NewTicker(2 * time.Hour)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		updatedPaths, err := loadBlock(pathsFile)
+		if err != nil {
+			log.Printf("Error updating blocked paths: %v", err)
+			continue
+		}
+
+		updatedUA, err := loadBlock(uaFile)
+		if err != nil {
+			log.Printf("Error updating blocked UA: %v", err)
+			continue
+		}
+
+		mu.Lock()
+		*paths = updatedPaths
+		*ua = updatedUA
+		mu.Unlock()
+	}
+}
+
 func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
@@ -78,7 +119,7 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 
 		rl.requests[ip]++
 
-		// Проверка на подозрительные типы ответа
+		// Проверка на подозрительные типы запросов
 		acceptHeader := c.Request.Header.Get("Accept")
 		if acceptHeader == "*/*" {
 			rl.requests[ip]++
@@ -89,6 +130,7 @@ func (rl *RateLimiter) Limit(blockedPaths, blockedUA []*regexp.Regexp) gin.Handl
 			for key, value := range c.Request.Header {
 				fmt.Printf("%s: %s\n", key, value)
 			}
+			time.Sleep(3 * time.Second)
 			c.JSON(http.StatusTooManyRequests, gin.H{"message": "You have exceeded the number of allowed requests. Please wait before trying again."})
 			c.Abort()
 			return

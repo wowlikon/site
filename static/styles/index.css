@@ -1,3 +1,44 @@
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    .certificates {
+        flex-direction: column;
+    }
+
+    .gallery img {
+        height: 100px;
+    }
+
+    .github-widget {
+        padding: 15px;
+    }
+
+    .arrow {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .gallery img {
+        height: 80px;
+    }
+
+    .indicator span {
+        width: 8px;
+        height: 8px;
+    }
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -11,9 +52,9 @@ h2 {
 
 .repositories {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-    padding: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    padding: 8px;
 }
 
 .github-widget {
@@ -23,7 +64,7 @@ h2 {
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     max-width: 400px;
-    margin: auto;
+    margin: 0 auto;
     margin-bottom: 20px;
 }
 
@@ -51,14 +92,15 @@ h2 {
 }
 
 .certificates {
-    display: flex;
+    display: column;
 }
 
 .sidebar {
     width: 100px;
     padding: 20px;
+    border-right: none;
     background-color: #f4f4f4;
-    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
 }
 
 .sidebar h2 {
@@ -68,11 +110,7 @@ h2 {
 }
 
 .gallery {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 10px;
 }
 
 .carousel {
@@ -143,4 +181,86 @@ h2 {
 
 .indicator span.active {
     background-color: #84c40a;
+}
+
+nav {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px;
+}
+
+.menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-item {
+    position: relative;
+}
+
+.menu-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.menu-button img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    z-index: 1000;
+    width: 300px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: none;
+    font-size: 14px;
+}
+
+.tab-button.active {
+    background: #ddd;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.hidden {
+    display: none;
 }
