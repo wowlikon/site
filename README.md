@@ -139,7 +139,7 @@ site/
   - HTTP/HTTPS
   - bit-torrent
   - другие источники
-- telegram/discord бот
+- telegram/discord/matrix бот
 
 ## Автор
 [wowlikon](https://github.com/wowlikon)

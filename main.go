@@ -18,22 +18,18 @@ import (
 )
 
 var config Config
-var jwtKey = []byte("your_secret_key")
+var jwtKey []byte
 
 // User структура для хранения данных пользователя
 type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Username string   `json:"username"`
+	Email    string   `json:"email"`
+	Password string   `json:"password"`
+	Roles    []string `json:"roles"`
 }
 
 // Database - имитация базы данных
 var usersDB = map[string]string{} // email -> hashedPassword
-
-// Claims структура для JWT
-type Claims struct {
-	Email                string `json:"email"`
-	jwt.RegisteredClaims        // Используем стандартные поля JWT
-}
 
 func main() {
 	gin.SetMode(gin.ReleaseMode)
@@ -42,6 +38,16 @@ func main() {
 	if _, err := toml.DecodeFile("config.toml", &config); err != nil {
 		fmt.Println("Error loading config:", err)
 		os.Exit(1)
+	}
+
+	if _, err := os.Stat("jwt.key"); os.IsNotExist(err) {
+		key, err := generateJWTKey()
+		if err != nil {
+			panic(err)
+		}
+		if err := saveJWTKey(key); err != nil {
+			panic(err)
+		}
 	}
 
 	var (
@@ -166,7 +172,7 @@ func register(c *gin.Context) {
 
 	// Проверка наличия пользователя
 	if _, exists := usersDB[user.Email]; exists {
-		c.JSON(http.StatusConflict, gin.H{"error": "User  already exists"})
+		c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
 		return
 	}
 
@@ -178,8 +184,9 @@ func register(c *gin.Context) {
 	}
 
 	// Сохранение пользователя
+	user.Roles = []string{}
 	usersDB[user.Email] = string(hashedPassword)
-	c.JSON(http.StatusCreated, gin.H{"message": "User  registered successfully"})
+	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 }
 
 // login - обработчик входа
@@ -200,7 +207,9 @@ func login(c *gin.Context) {
 	// Создание JWT
 	expirationTime := time.Now().Add(15 * time.Minute)
 	claims := &Claims{
-		Email: user.Email,
+		Username: user.Username,
+		Email:    user.Email,
+		Roles:    user.Roles,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
@@ -222,8 +231,9 @@ func login(c *gin.Context) {
 func profile(c *gin.Context) {
 	claims := c.MustGet("claims").(*Claims)
 	c.JSON(http.StatusOK, gin.H{
-		"email":   claims.Email,
-		"message": "Welcome to your profile!",
+		"username": claims.Username,
+		"email":    claims.Email,
+		"roles":    claims.Roles,
 	})
 }
 

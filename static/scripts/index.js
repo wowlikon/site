@@ -2,26 +2,61 @@ function isAuthenticated() {
   return !!localStorage.getItem("authToken");
 }
 
+function parseJwt(token) {
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join(""),
+  );
+
+  return JSON.parse(jsonPayload);
+}
+
 function setupMenu() {
   const tabs = document.querySelector(".tabs");
   const avatar = document.getElementById("avatar");
+  const dropdown = document.querySelector(".dropdown");
   const authForms = document.querySelector(".tab-content");
   const profileMenu = document.getElementById("profile-menu");
   const userName = document.getElementById("user-name");
 
   if (isAuthenticated()) {
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    userName.textContent = userData.email || "User  ";
+    const token = localStorage.getItem("authToken");
+    const userData = parseJwt(token);
+    userName.textContent = userData.username || "User";
     avatar.src = `https://www.gravatar.com/avatar/${md5(userData.email)}?d=identicon`;
-    tabs.classList.add("hidden");
-    authForms.classList.add("hidden");
-    profileMenu.classList.remove("hidden");
+
+    // Скрываем элементы авторизации
+    tabs.style.display = "none";
+    authForms.style.display = "none";
+
+    // Показываем профиль
+    profileMenu.style.display = "block";
+
+    // Закрываем выпадающее меню если оно открыто
+    dropdown.style.display = "none";
   } else {
     avatar.src = "/static/images/default-avatar.png";
-    authForms.classList.remove("hidden");
-    profileMenu.classList.add("hidden");
-    authForms.classList.add("active");
-    tabs.classList.remove("hidden");
+
+    // Показываем элементы авторизации
+    tabs.style.display = "flex";
+    authForms.style.display = "block";
+
+    // Скрываем профиль
+    profileMenu.style.display = "none";
+
+    // Активируем первую вкладку по умолчанию
+    const firstTab = document.querySelector(".tab-button");
+    const firstPane = document.querySelector(".tab-pane");
+    if (firstTab && firstPane) {
+      firstTab.classList.add("active");
+      firstPane.classList.add("active");
+    }
   }
 }
 
@@ -66,7 +101,6 @@ document
 
       const data = await response.json();
       localStorage.setItem("authToken", data.token);
-      localStorage.setItem("userData", JSON.stringify({ email }));
 
       alert("Вход выполнен!");
       setupMenu();
@@ -81,6 +115,7 @@ document
   .addEventListener("submit", async (event) => {
     event.preventDefault();
     const email = document.getElementById("register-email").value;
+    const username = document.getElementById("register-username").value;
     const password = document.getElementById("register-password").value;
     const confirmPassword = document.getElementById(
       "register-confirm-password",
@@ -97,7 +132,7 @@ document
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (!response.ok) {
@@ -115,7 +150,6 @@ document
 
 document.getElementById("logout-button").addEventListener("click", () => {
   localStorage.removeItem("authToken");
-  localStorage.removeItem("userData");
 
   alert("Вы вышли из аккаунта.");
   setupMenu();
