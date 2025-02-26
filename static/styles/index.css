@@ -264,6 +264,7 @@ nav {
 .tab-pane {
     display: none;
     padding: 15px;
+    padding-bottom: 0;
 }
 
 .tab-pane form {
